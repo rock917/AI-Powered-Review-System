@@ -1,0 +1,41 @@
+# Virtual environment
+venv/
+
+# Data files (too large for GitHub)
+data/raw/
+data/processed/
+
+# Trained models (too large for GitHub)
+models/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Environment variables
+.env
+
+# Streamlit secrets
+.streamlit/secrets.toml
+
+# VS Code settings
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+
+# Local SQLite/cache database
+*.db
+feedbackiq_cache*
