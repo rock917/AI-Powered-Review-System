@@ -44,7 +44,20 @@ def render():
         type=['csv'],
         label_visibility="collapsed"
     )
-
+        # ── Environment banner ────────────────────────────────────
+    import torch
+    if not torch.cuda.is_available():
+        st.info(
+            "💡 **Cloud deployment** — Batch analysis is limited to "
+            "**500 reviews** on the free CPU tier. "
+            "For larger datasets (up to 10,000 rows), "
+            "run the app locally with GPU support."
+        )
+    else:
+        st.success(
+            "⚡ **GPU detected** — Batch analysis supports up to "
+            "10,000 reviews."
+        )
     if uploaded is None:
         empty_state(
             "📂",

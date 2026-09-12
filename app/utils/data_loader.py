@@ -16,31 +16,42 @@ def get_path(*args):
 @st.cache_data(show_spinner=False)
 def load_demo_data():
     """
-    Load 500 reviews from test set as demo dataset.
-    Cached — only loads once per session.
+    Load demo dataset.
+    First tries the processed test.csv (local dev).
+    Falls back to hardcoded demo data (deployment).
     """
+    import os
     path = get_path('data', 'processed', 'test.csv')
-    if not os.path.exists(path):
-        return None
-    df = pd.read_csv(path)
-    df = df.sample(n=min(500, len(df)), random_state=42).reset_index(drop=True)
-    df['date'] = pd.to_datetime(df['Time'], unit='s', errors='coerce')
-    df['year'] = df['date'].dt.year
-    df['cleaned_text'] = df['cleaned_text'].fillna('')
-    return df
+
+    if os.path.exists(path):
+        df = pd.read_csv(path)
+        df = df.sample(n=min(500, len(df)),
+                       random_state=42).reset_index(drop=True)
+        df['date'] = pd.to_datetime(df['Time'], unit='s',
+                                    errors='coerce')
+        df['year'] = df['date'].dt.year
+        df['cleaned_text'] = df['cleaned_text'].fillna('')
+        return df
+    else:
+        # Deployment fallback — use hardcoded demo data
+        from utils.demo_data import get_demo_dataframe
+        return get_demo_dataframe()
 
 
 @st.cache_data(show_spinner=False)
 def load_demo_with_predictions():
     """
     Load demo data with model predictions.
-    Cached separately so predictions don't re-run on every interaction.
+    Cached so predictions don't re-run on every interaction.
     """
     from src.inference import predict_batch
     df = load_demo_data()
     if df is None:
         return None
-    results = predict_batch(df['cleaned_text'].tolist(), show_progress=False)
+    results = predict_batch(
+        df['cleaned_text'].fillna('').tolist(),
+        show_progress=False
+    )
     df['predicted_sentiment'] = [r['sentiment']     for r in results]
     df['confidence']          = [r['confidence']    for r in results]
     df['prob_positive']       = [r['prob_positive'] for r in results]

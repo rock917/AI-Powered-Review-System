@@ -1,15 +1,19 @@
 # app/utils/validators.py
 # FeedbackIQ — Input and File Validation
 
+import torch
 import pandas as pd
 
+# Automatically detect environment
+# GPU available = running locally = higher limit
+# CPU only = running on cloud = conservative limit
+IS_GPU = torch.cuda.is_available()
+MAX_ROWS = 10000 if IS_GPU else 500
+
 ACCEPTED_TEXT_COLUMNS = [
-    # Amazon / Kaggle standard
     'reviewText', 'review_text', 'cleaned_text',
-    # Generic
     'text', 'Text', 'review', 'Review',
     'comment', 'Comment', 'feedback', 'Feedback',
-    # With spaces (Trustpilot, Google, etc.)
     'Review Text', 'review text', 'Review Body',
     'review body', 'Review Content', 'review content',
     'Customer Review', 'customer review',
@@ -17,40 +21,23 @@ ACCEPTED_TEXT_COLUMNS = [
     'Description', 'description', 'Message', 'message',
 ]
 
-MAX_ROWS = 10000
-MIN_WORDS = 2
-
 
 def validate_review_text(text: str) -> dict:
-    """
-    Validate a single review text input.
-    Returns dict with 'valid' bool and 'error' message.
-    """
     if not text or not isinstance(text, str):
         return {'valid': False, 'error': 'Please enter a review.'}
-
     text = text.strip()
-
     if len(text) == 0:
         return {'valid': False, 'error': 'Review text is empty.'}
-
-    words = text.split()
-    if len(words) < MIN_WORDS:
+    if len(text.split()) < 2:
         return {'valid': False,
-                'error': f'Review too short. Enter at least {MIN_WORDS} words.'}
-
+                'error': 'Review too short. Enter at least 2 words.'}
     if len(text) > 10000:
         return {'valid': False,
                 'error': 'Review too long. Maximum 10,000 characters.'}
-
     return {'valid': True, 'error': None}
 
 
 def validate_csv(df: pd.DataFrame) -> dict:
-    """
-    Validate an uploaded CSV DataFrame.
-    Returns dict with validation results.
-    """
     if df is None or len(df) == 0:
         return {
             'valid'      : False,
@@ -60,7 +47,6 @@ def validate_csv(df: pd.DataFrame) -> dict:
             'truncated'  : False
         }
 
-    # Find text column
     text_col = None
     for col in ACCEPTED_TEXT_COLUMNS:
         if col in df.columns:
@@ -82,7 +68,6 @@ def validate_csv(df: pd.DataFrame) -> dict:
 
     truncated = len(df) > MAX_ROWS
 
-        # Detect optional rating column
     rating_col = None
     for col in ['Rating', 'rating', 'Score', 'score', 'Stars', 'stars']:
         if col in df.columns:
