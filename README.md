@@ -386,27 +386,6 @@ The trained model is hosted on Hugging Face Model Hub and loaded at runtime. Thi
 
 ---
 
-## 📈 Resume Bullet Points
-
-```
-• Fine-tuned DistilBERT (66M parameters) on 110,000 balanced Amazon
-  reviews achieving 95.01% accuracy and 95.02% F1-score on 11,000
-  unseen test reviews — a +2.89% improvement over TF-IDF baseline
-
-• Built complete end-to-end NLP pipeline: data cleaning, class
-  balancing, tokenization, GPU fine-tuning on NVIDIA RTX 2050
-  (CUDA 12.7), and evaluation using accuracy, precision, recall, F1
-
-• Deployed production-ready ML web application at
-  feedbackiq.streamlit.app using Streamlit Cloud with model hosted
-  on Hugging Face Model Hub following industry MLOps practices
-
-• Implemented SQLite inference cache using SHA256 hashing, reducing
-  repeat batch analysis from minutes to seconds with real-time
-  cache hit rate reporting
-```
-
----
 
 ## 🙏 Acknowledgements
 
