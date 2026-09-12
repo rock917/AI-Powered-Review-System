@@ -31,14 +31,18 @@ def sentiment_donut(pos_count: int, neg_count: int, title: str = "") -> go.Figur
         showarrow=False
     )
 
-    fig.update_layout(
+    layout = dict(
         template=PLOTLY_TEMPLATE,
         showlegend=True,
         legend=dict(orientation='h', yanchor='bottom', y=-0.15, xanchor='center', x=0.5),
         margin=dict(t=30, b=30, l=10, r=10),
         height=320,
-        title=dict(text=title, font=dict(size=14, color='#111827')) if title else None
     )
+
+    if title:
+        layout['title'] = dict(text=title, font=dict(size=14, color='#111827'))
+
+    fig.update_layout(**layout)
     return fig
 
 
@@ -177,15 +181,24 @@ def sentiment_by_rating(df: pd.DataFrame) -> go.Figure:
 def model_comparison_bar(baseline: dict, distilbert: dict) -> go.Figure:
     """Grouped bar comparing baseline vs DistilBERT metrics."""
     metrics = ['Accuracy', 'Precision', 'Recall', 'F1-Score']
-    b_vals  = [baseline['accuracy'], baseline['precision'],
-                baseline['recall'],  baseline['f1']]
-    d_vals  = [distilbert['accuracy'], distilbert['precision'],
-                distilbert['recall'],  distilbert['f1']]
+    b_vals = [
+        baseline['accuracy'],
+        baseline['precision'],
+        baseline['recall'],
+        baseline['f1']
+    ]
+    d_vals = [
+        distilbert['accuracy'],
+        distilbert['precision'],
+        distilbert['recall'],
+        distilbert['f1']
+    ]
 
     fig = go.Figure()
     fig.add_trace(go.Bar(
         name='TF-IDF + Logistic Regression',
-        x=metrics, y=b_vals,
+        x=metrics,
+        y=b_vals,
         marker_color='#94A3B8',
         text=[f'{v:.4f}' for v in b_vals],
         textposition='outside',
@@ -193,7 +206,8 @@ def model_comparison_bar(baseline: dict, distilbert: dict) -> go.Figure:
     ))
     fig.add_trace(go.Bar(
         name='Fine-tuned DistilBERT',
-        x=metrics, y=d_vals,
+        x=metrics,
+        y=d_vals,
         marker_color=CHART_COLORS['primary'],
         text=[f'{v:.4f}' for v in d_vals],
         textposition='outside',
@@ -205,10 +219,20 @@ def model_comparison_bar(baseline: dict, distilbert: dict) -> go.Figure:
         barmode='group',
         height=380,
         margin=dict(t=40, b=20, l=10, r=10),
-        yaxis=dict(range=[0.85, 1.0], title='Score',
-                   showgrid=True, gridcolor='#F3F4F6'),
+        yaxis=dict(
+            range=[0.85, 1.0],
+            title='Score',
+            showgrid=True,
+            gridcolor='#F3F4F6'
+        ),
         xaxis=dict(showgrid=False),
-        legend=dict(orientation='h', yanchor='bottom', y=-0.25, xanchor='center', x=0.5),
+        legend=dict(
+            orientation='h',
+            yanchor='bottom',
+            y=-0.25,
+            xanchor='center',
+            x=0.5
+        ),
         plot_bgcolor='white'
     )
     return fig
@@ -222,14 +246,18 @@ def training_curves(history: dict) -> go.Figure:
 
     # Loss curves
     fig.add_trace(go.Scatter(
-        x=epochs, y=history['train_loss'],
-        name='Train Loss', mode='lines+markers',
+        x=epochs,
+        y=history['train_loss'],
+        name='Train Loss',
+        mode='lines+markers',
         line=dict(color='#2563EB', width=2),
         marker=dict(size=7)
     ))
     fig.add_trace(go.Scatter(
-        x=epochs, y=history['val_loss'],
-        name='Val Loss', mode='lines+markers',
+        x=epochs,
+        y=history['val_loss'],
+        name='Val Loss',
+        mode='lines+markers',
         line=dict(color='#DC2626', width=2, dash='dash'),
         marker=dict(size=7)
     ))
@@ -240,7 +268,13 @@ def training_curves(history: dict) -> go.Figure:
         margin=dict(t=20, b=20, l=10, r=10),
         xaxis=dict(title='Epoch', tickvals=epochs, showgrid=False),
         yaxis=dict(title='Loss', showgrid=True, gridcolor='#F3F4F6'),
-        legend=dict(orientation='h', yanchor='bottom', y=-0.3, xanchor='center', x=0.5),
+        legend=dict(
+            orientation='h',
+            yanchor='bottom',
+            y=-0.3,
+            xanchor='center',
+            x=0.5
+        ),
         hovermode='x unified',
         plot_bgcolor='white'
     )
@@ -253,14 +287,18 @@ def accuracy_curves(history: dict) -> go.Figure:
     epochs = history['epoch']
 
     fig.add_trace(go.Scatter(
-        x=epochs, y=[v * 100 for v in history['train_acc']],
-        name='Train Accuracy', mode='lines+markers',
+        x=epochs,
+        y=[v * 100 for v in history['train_acc']],
+        name='Train Accuracy',
+        mode='lines+markers',
         line=dict(color='#16A34A', width=2),
         marker=dict(size=7)
     ))
     fig.add_trace(go.Scatter(
-        x=epochs, y=[v * 100 for v in history['val_acc']],
-        name='Val Accuracy', mode='lines+markers',
+        x=epochs,
+        y=[v * 100 for v in history['val_acc']],
+        name='Val Accuracy',
+        mode='lines+markers',
         line=dict(color='#D97706', width=2, dash='dash'),
         marker=dict(size=7)
     ))
@@ -277,9 +315,19 @@ def accuracy_curves(history: dict) -> go.Figure:
         height=320,
         margin=dict(t=20, b=20, l=10, r=10),
         xaxis=dict(title='Epoch', tickvals=epochs, showgrid=False),
-        yaxis=dict(title='Accuracy (%)', showgrid=True,
-                   gridcolor='#F3F4F6', range=[88, 100]),
-        legend=dict(orientation='h', yanchor='bottom', y=-0.3, xanchor='center', x=0.5),
+        yaxis=dict(
+            title='Accuracy (%)',
+            showgrid=True,
+            gridcolor='#F3F4F6',
+            range=[88, 100]
+        ),
+        legend=dict(
+            orientation='h',
+            yanchor='bottom',
+            y=-0.3,
+            xanchor='center',
+            x=0.5
+        ),
         hovermode='x unified',
         plot_bgcolor='white'
     )
