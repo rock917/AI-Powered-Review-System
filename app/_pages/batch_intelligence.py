@@ -11,9 +11,9 @@ from components.cards import render_kpi_row, empty_state
 from utils.validators import validate_csv
 
 # Environment detection
-IS_GPU     = torch.cuda.is_available()
-HARD_LIMIT = 10000 if IS_GPU else 500
-
+#IS_GPU     = torch.cuda.is_available()
+#HARD_LIMIT = 10000 if IS_GPU else 500
+HARD_LIMIT = 10000
 
 def estimate_time(n: int) -> str:
     """Estimate inference time based on environment."""
